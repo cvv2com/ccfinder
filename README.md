@@ -28,7 +28,7 @@ pip install PyPDF2
 
 ### 3. Script Dosyasını İndir
 
-`powergrep_style_cc_extractor.py` dosyasını bilgisayarınıza indirin ya da repodan klonlayın.
+`ccfinder.py` dosyasını bilgisayarınıza indirin ya da repodan klonlayın.
 
 ## Kullanım
 
@@ -44,19 +44,19 @@ cd /home/kullanici/klasor     # Linux/Mac
 Bir dosyada arama yapmak için:
 
 ```bash
-python powergrep_style_cc_extractor.py ornek.txt
+python ccfinder.py
 ```
 
 Bir klasörü (ve alt klasörlerini) taramak için:
 
 ```bash
-python powergrep_style_cc_extractor.py ./veriklasoru
+python3 ccfinder.py
 ```
 
 Sonuçları CSV dosyasına yazmak için:
 
 ```bash
-python powergrep_style_cc_extractor.py ./veriklasoru --csv cikti.csv
+python ccfinder.py
 ```
 
 ### PDF ve E-posta Desteği
