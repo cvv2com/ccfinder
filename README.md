@@ -1,4 +1,4 @@
-# PowerGREP Style Kredi Kartı, Exp ve CVV Extractor
+# CVV2.NET Card CVV information Extractor
 
 Bu script, farklı formatlarda (düz metin, CSV, JSON, e-posta, PDF) bulunan kredi kartı numarası, son kullanma tarihi (exp) ve CVV bilgilerini tespit edip çıkartmak için geliştirilmiştir. Gelişmiş anahtar kelime havuzu, context analizi ve negatif keyword filtreleme özellikleri sayesinde hem Türkçe hem İngilizce veriyle yüksek başarıyla çalışır.
 
@@ -78,8 +78,9 @@ Aşağıdaki anahtar kelimeler içeren satırlar/alanlar **kart/exp/cvv araması
 ## Hata ve Destek
 
 - Script hem Windows hem Linux hem de MacOS ortamında çalışır.
-- Hata alırsanız veya yeni format/özellik ekletmek isterseniz [issue açabilirsiniz](https://github.com/<kendi-repo-linkiniz>/issues) veya bana ulaşabilirsiniz.
-
+- Hata alırsanız veya yeni format/özellik ekletmek isterseniz veya bana ulaşabilirsiniz.
+https://bhf.pro/threads/629649/
+https://www.cvv2.net
 ## Lisans
 
 MIT Lisansı (veya kendi seçtiğiniz bir açık kaynak lisansı).
