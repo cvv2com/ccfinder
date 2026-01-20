@@ -14,15 +14,17 @@ Bu proje, farklı formatlarda bulunan kredi kartı numarası, son kullanma tarih
 - Alakasız (username, password, domain, host, vb.) alanları filtreleme
 - Sonuçları ekrana ve isteğe bağlı olarak CSV dosyasına yazma
 
-### ocr_card_extractor.py ⭐ YENİ ÖZELLİKLER
+### ocr_card_extractor.py ⭐ YENİ ÖZELLİKLER v2.1
 - ✅ **PDF ve Görsel Desteği**: PDF, JPG, PNG, BMP, TIFF formatlarını destekler
+- ✅ **Akıllı Dosya Tespiti** 🆕: İçerik analiziyle yanlış/eksik uzantılı dosyaları tespit eder
+- ✅ **Magic Byte Analizi** 🆕: Uzantıdan bağımsız format tespiti (PDF, JPEG, PNG, GIF, BMP, TIFF, WebP)
 - ✅ **Tesseract OCR**: Tam kart bilgisi (PAN, SKT, CVV) çıkarma
 - ✅ **Görüntü İşleme**: Kabartmalı/yazılı rakamları netleştirme (Gaussian blur, adaptive threshold)
 - ✅ **AI Organizasyon**: Dosyaları kart sahibine göre otomatik organize etme (Nero AI Photo Tagger benzeri)
 - ✅ **Çoklu Dil Desteği**: Türkçe, İngilizce, İspanyolca etiket tanıma
 - ✅ **Zaman Damgası**: Her tarama için zaman kaydı
 - ✅ **Güvenli Çıktı**: CSV dosyasına kısıtlı izinlerle kaydetme (chmod 600)
-- ✅ **Detaylı Raporlama**: Başarı/başarısızlık istatistikleri
+- ✅ **Detaylı Raporlama**: Başarı/başarısızlık istatistikleri + tespit yöntemi takibi
 
 ## Kurulum
 

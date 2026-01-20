@@ -9,6 +9,8 @@ from pdf2image import convert_from_path
 from PIL import Image
 import shutil
 from datetime import datetime
+import imghdr
+import mimetypes
 
 # --- AYARLAR / SETTINGS ---
 # Windows kullanıyorsanız Tesseract yolunu buraya ekleyin
@@ -114,6 +116,117 @@ def extract_full_cc_details(text):
         data["Kart_Sahibi"] = name_match.group(1).strip()
     
     return data
+
+def detect_file_type(filepath):
+    """
+    Dosya içeriğine bakarak gerçek dosya tipini tespit eder.
+    Detects actual file type by examining file content (magic bytes).
+    
+    Uzantı yanlış veya eksik olsa bile içeriğe göre tespit yapar.
+    Detects even if extension is wrong or missing.
+    
+    Args:
+        filepath: Dosya yolu / File path
+    
+    Returns:
+        'pdf', 'image', 'unknown' veya None
+    """
+    try:
+        # İlk birkaç byte'ı oku / Read first few bytes
+        with open(filepath, 'rb') as f:
+            header = f.read(16)
+        
+        if not header:
+            return None
+        
+        # PDF kontrolü / PDF check
+        if header.startswith(b'%PDF'):
+            return 'pdf'
+        
+        # JPEG kontrolü / JPEG check
+        if header.startswith(b'\xff\xd8\xff'):
+            return 'image'
+        
+        # PNG kontrolü / PNG check
+        if header.startswith(b'\x89PNG\r\n\x1a\n'):
+            return 'image'
+        
+        # GIF kontrolü / GIF check
+        if header.startswith(b'GIF87a') or header.startswith(b'GIF89a'):
+            return 'image'
+        
+        # BMP kontrolü / BMP check
+        if header.startswith(b'BM'):
+            return 'image'
+        
+        # TIFF kontrolü (Little Endian) / TIFF check (Little Endian)
+        if header.startswith(b'II\x2a\x00'):
+            return 'image'
+        
+        # TIFF kontrolü (Big Endian) / TIFF check (Big Endian)
+        if header.startswith(b'MM\x00\x2a'):
+            return 'image'
+        
+        # WebP kontrolü / WebP check
+        if header.startswith(b'RIFF') and header[8:12] == b'WEBP':
+            return 'image'
+        
+        # imghdr modülünü de dene / Also try imghdr module
+        img_type = imghdr.what(filepath)
+        if img_type:
+            return 'image'
+        
+        # PIL ile açmayı dene / Try opening with PIL
+        try:
+            with Image.open(filepath) as img:
+                img.verify()
+                return 'image'
+        except:
+            pass
+        
+        return 'unknown'
+        
+    except Exception as e:
+        return None
+
+def is_potential_image_or_pdf(filepath):
+    """
+    Dosyanın görsel veya PDF olup olmadığını kontrol eder.
+    Checks if file is an image or PDF.
+    
+    Hem uzantıya hem de içeriğe bakar / Checks both extension and content.
+    
+    Args:
+        filepath: Dosya yolu / File path
+    
+    Returns:
+        (is_valid, file_type, detected_by) tuple
+    """
+    filename = os.path.basename(filepath)
+    ext = os.path.splitext(filename)[1].lower()
+    
+    # Önce uzantıya bak / First check extension
+    if ext in IMAGE_EXTENSIONS:
+        return (True, 'image', 'extension')
+    elif ext == PDF_EXTENSION:
+        return (True, 'pdf', 'extension')
+    
+    # Uzantı bulunamadı veya bilinmiyor, içeriğe bak
+    # Extension not found or unknown, check content
+    detected_type = detect_file_type(filepath)
+    
+    if detected_type == 'pdf':
+        return (True, 'pdf', 'content')
+    elif detected_type == 'image':
+        return (True, 'image', 'content')
+    elif detected_type == 'unknown':
+        # Bilinmeyen ama potansiyel görsel olabilir
+        # Unknown but potentially could be an image
+        # Uzantısız veya garip uzantılı dosyalar için PIL ile deneme yap
+        # Try with PIL for files without extension or weird extensions
+        return (False, 'unknown', 'unknown')
+    else:
+        return (False, None, None)
 
 def process_image_file(filepath):
     """
@@ -221,20 +334,32 @@ def get_supported_files(folder):
     Klasördeki desteklenen tüm dosyaları listeler.
     Lists all supported files in the folder.
     
+    Hem uzantıya hem de dosya içeriğine bakarak tespit eder.
+    Detects by both extension and file content.
+    
     Args:
         folder: Taranacak klasör / Folder to scan
     
     Returns:
-        Dosya listesi / List of files
+        Dosya listesi ve tespit bilgileri / List of files with detection info
+        [(filename, file_type, detected_by), ...]
     """
     files = []
     if not os.path.exists(folder):
         return files
     
     for filename in os.listdir(folder):
-        ext = os.path.splitext(filename)[1].lower()
-        if ext in IMAGE_EXTENSIONS or ext == PDF_EXTENSION:
-            files.append(filename)
+        filepath = os.path.join(folder, filename)
+        
+        # Klasörleri atla / Skip directories
+        if os.path.isdir(filepath):
+            continue
+        
+        # Dosya tipini tespit et / Detect file type
+        is_valid, file_type, detected_by = is_potential_image_or_pdf(filepath)
+        
+        if is_valid:
+            files.append((filename, file_type, detected_by))
     
     return files
 
@@ -272,12 +397,20 @@ def main():
         return
     
     # Dosya türlerini say / Count file types
-    pdf_count = sum(1 for f in files if f.lower().endswith(PDF_EXTENSION))
-    image_count = len(files) - pdf_count
+    pdf_count = sum(1 for _, ftype, _ in files if ftype == 'pdf')
+    image_count = sum(1 for _, ftype, _ in files if ftype == 'image')
+    by_extension = sum(1 for _, _, detected in files if detected == 'extension')
+    by_content = sum(1 for _, _, detected in files if detected == 'content')
     
     print(f"\nToplam {len(files)} dosya taranacak / Total files to scan:")
     print(f"  - PDF dosyaları / PDF files: {pdf_count}")
     print(f"  - Görsel dosyaları / Image files: {image_count}")
+    print(f"\nTespit yöntemi / Detection method:")
+    print(f"  - Uzantıya göre / By extension: {by_extension}")
+    print(f"  - İçeriğe göre / By content: {by_content} 🔍")
+    if by_content > 0:
+        print(f"    ℹ️  {by_content} dosya yanlış/eksik uzantıya sahip ama içerik analizi ile tespit edildi")
+        print(f"    ℹ️  {by_content} file(s) have wrong/missing extension but detected by content analysis")
     
     # Kullanıcı onayı / User confirmation
     print(f"\nDosyalar şu klasöre organize edilecek / Files will be organized to:")
@@ -295,26 +428,29 @@ def main():
     print("Tarama başlıyor / Scanning started...")
     print(f"{'='*70}\n")
 
-    for i, filename in enumerate(files, 1):
+    for i, (filename, file_type, detected_by) in enumerate(files, 1):
         filepath = os.path.join(KAYNAK_KLASORU, filename)
-        ext = os.path.splitext(filename)[1].lower()
         
-        print(f"[{i}/{len(files)}] İşleniyor / Processing: {filename}")
+        detection_info = f" [İçerik✓]" if detected_by == 'content' else ""
+        print(f"[{i}/{len(files)}] İşleniyor / Processing: {filename}{detection_info}")
         
         try:
-            # Dosya türüne göre işle / Process based on file type
-            if ext == PDF_EXTENSION:
+            # Dosya türüne göre işle / Process based on detected file type
+            if file_type == 'pdf':
                 full_text = process_pdf_file(filepath)
-            elif ext in IMAGE_EXTENSIONS:
+                file_type_label = 'PDF'
+            elif file_type == 'image':
                 full_text = process_image_file(filepath)
+                file_type_label = 'Görsel/Image'
             else:
                 continue
 
             # Veriyi Regex ile çek / Extract data with regex
             card_info = extract_full_cc_details(full_text)
             card_info['Dosya_Kaynagi'] = filename
-            card_info['Dosya_Tipi'] = 'PDF' if ext == PDF_EXTENSION else 'Görsel/Image'
+            card_info['Dosya_Tipi'] = file_type_label
             card_info['Tarama_Zamani'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            card_info['Tespit_Yontemi'] = 'İçerik Analizi' if detected_by == 'content' else 'Uzantı'
             
             # Eğer kart numarası bulunduysa / If card number found
             if card_info['Kart_Numarasi']:
@@ -351,8 +487,8 @@ def main():
             df['Kart_Numarasi'] = df['Kart_Numarasi'].astype(str)
         
         # Sütun sıralaması / Column order
-        column_order = ['Dosya_Kaynagi', 'Dosya_Tipi', 'Kart_Sahibi', 'Kart_Numarasi', 
-                       'SKT', 'CVV', 'Tarama_Zamani']
+        column_order = ['Dosya_Kaynagi', 'Dosya_Tipi', 'Tespit_Yontemi', 'Kart_Sahibi', 
+                       'Kart_Numarasi', 'SKT', 'CVV', 'Tarama_Zamani']
         df = df[[col for col in column_order if col in df.columns]]
         
         df.to_csv(CIKTI_DOSYASI, index=False, sep=',', quotechar='"', quoting=csv.QUOTE_ALL)
