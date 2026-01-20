@@ -18,7 +18,7 @@ def test_extract_full_cc_details():
     # Copy the function logic for testing
     def extract_full_cc_details(text):
         """
-        Metin içinden 16 haneli kart no, tarih ve CVV ayıklar.
+        Metin içinden 13-19 haneli kart no, tarih ve CVV ayıklar.
         """
         data = {
             "Kart_Sahibi": None,
@@ -56,7 +56,7 @@ def test_extract_full_cc_details():
             potential_cvvs = re.findall(r'\b\d{3,4}\b', text)
             for val in potential_cvvs:
                 # Tarih parçası veya kart numarasının parçası değilse al
-                if val not in (data["Kart_Numarasi"] or ""):
+                if data["Kart_Numarasi"] is None or val not in data["Kart_Numarasi"]:
                     data["CVV"] = val
                     break
 

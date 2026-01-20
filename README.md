@@ -64,7 +64,7 @@ pip install PyPDF2 pdf2image pytesseract opencv-python pandas numpy
 
 > **Not:** Standart Python kurulumu genellikle diğer gerekli modülleri (json, csv, re) içerir.
 
-### 3. Script Dosyasını İndir
+### 4. Script Dosyasını İndir
 
 Scripti bilgisayarınıza indirin ya da repodan klonlayın:
 

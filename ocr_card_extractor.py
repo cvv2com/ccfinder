@@ -1,5 +1,6 @@
 import os
 import re
+import csv
 import cv2
 import pytesseract
 import pandas as pd
@@ -34,7 +35,7 @@ def preprocess_image_for_card(image):
 
 def extract_full_cc_details(text):
     """
-    Metin içinden 16 haneli kart no, tarih ve CVV ayıklar.
+    Metin içinden 13-19 haneli kart no, tarih ve CVV ayıklar.
     """
     data = {
         "Kart_Sahibi": None,
@@ -76,7 +77,7 @@ def extract_full_cc_details(text):
         potential_cvvs = re.findall(r'\b\d{3,4}\b', text)
         for val in potential_cvvs:
             # Tarih parçası veya kart numarasının parçası değilse al
-            if val not in (data["Kart_Numarasi"] or ""):
+            if data["Kart_Numarasi"] is None or val not in data["Kart_Numarasi"]:
                 data["CVV"] = val
                 break
 
@@ -131,7 +132,7 @@ def main():
     if all_data:
         df = pd.DataFrame(all_data)
         # Kart numaralarının Excel'de bilimsel sayı (1.23E+15) gibi görünmemesi için string olarak sakla
-        df.to_csv(CIKTI_DOSYASI, index=False, sep=',', quotechar='"', quoting=1) 
+        df.to_csv(CIKTI_DOSYASI, index=False, sep=',', quotechar='"', quoting=csv.QUOTE_ALL) 
         print(f"\nBaşarılı! Tüm veriler '{CIKTI_DOSYASI}' dosyasına kaydedildi.")
     else:
         print("\nHiçbir dosyadan kart verisi çekilemedi.")
