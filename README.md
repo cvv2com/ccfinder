@@ -28,6 +28,20 @@ Bu proje, farklı formatlarda bulunan kredi kartı numarası, son kullanma tarih
 
 ## Kurulum
 
+### 🪟 Windows Kullanıcıları İçin Hızlı Başlangıç
+
+**Windows için özel hazırlanan kolay kurulum ve kullanım:**
+
+1. **Hızlı Kurulum**: `setup_windows.bat` dosyasına çift tıklayın
+2. **Çalıştırma**: 
+   - Metin tarayıcı için: `run_cvv2net.bat`
+   - OCR çıkartıcı için: `run_ocr_extractor.bat`
+3. **EXE Oluşturma**: `build_windows_exe.bat` (Python kurulu olmayan bilgisayarlar için)
+
+📖 **Detaylı Windows Kılavuzu**: [WINDOWS_GUIDE.md](WINDOWS_GUIDE.md) dosyasına bakın
+
+---
+
 ### 1. Python Kurulumu
 
 Öncelikle [Python 3](https://www.python.org/downloads/) yüklü olmalı.
@@ -50,8 +64,10 @@ brew install poppler
 ```
 
 **Windows:**
-- [Tesseract installer](https://github.com/UB-Mannheim/tesseract/wiki) sayfasından indirip kurun
+- Kolay kurulum için `setup_windows.bat` dosyasını çalıştırın (otomatik kontrol yapar)
+- Manuel kurulum: [Tesseract installer](https://github.com/UB-Mannheim/tesseract/wiki) sayfasından indirip kurun
 - Kurulum sonrası `ocr_card_extractor.py` dosyasında tesseract yolunu güncelleyin
+- Detaylı adımlar için [WINDOWS_GUIDE.md](WINDOWS_GUIDE.md) dosyasına bakın
 
 ### 3. Gerekli Python Paketleri
 
@@ -80,6 +96,50 @@ cd ccfinder
 
 ## Kullanım
 
+### 🪟 Windows için Kolay Kullanım
+
+**Windows kullanıcıları için üç farklı yöntem:**
+
+#### Yöntem 1: Batch Dosyaları (Önerilen - En Kolay) ⭐
+
+Proje klasöründe hazır batch dosyalarına çift tıklayın:
+
+```
+run_cvv2net.bat         - Metin tabanlı tarayıcı
+run_ocr_extractor.bat   - OCR tabanlı çıkartıcı
+```
+
+Batch dosyaları otomatik olarak:
+- Python'un kurulu olduğunu kontrol eder
+- Gerekli paketleri yükler
+- Programı çalıştırır
+
+#### Yöntem 2: Windows EXE Dosyaları (Python Gerektirmez)
+
+Python kurulu olmayan bilgisayarlarda kullanmak için:
+
+```cmd
+build_windows_exe.bat
+```
+
+Bu komut `dist/` klasöründe `.exe` dosyaları oluşturur:
+- `cvv2net.exe`
+- `ocr_card_extractor.exe`
+
+Bu `.exe` dosyaları başka Windows bilgisayarlara kopyalanabilir ve Python kurulumu olmadan çalışır.
+
+#### Yöntem 3: Manuel Python Çalıştırma
+
+Komut satırında (CMD veya PowerShell):
+
+```cmd
+python cvv2net.py
+```
+
+📖 **Detaylı Windows kullanımı için**: [WINDOWS_GUIDE.md](WINDOWS_GUIDE.md)
+
+---
+
 ### Metin Tabanlı Tarama (cvv2net.py)
 
 Komut satırında scriptin bulunduğu dizine geçin:
@@ -95,6 +155,7 @@ Bir dosyada veya klasörde arama yapmak için:
 
 ```bash
 python cvv2net.py
+# VEYA Windows için: run_cvv2net.bat
 ```
 
 Program sizden taranacak yol ve thread sayısı gibi bilgileri isteyecektir.
