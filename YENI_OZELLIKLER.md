@@ -1,10 +1,73 @@
 # Yeni Özellikler / New Features
 
-## OCR Kart Çıkartıcı v2.1 - Yeni Özellikler
+## OCR Kart Çıkartıcı v2.2 - En Son Özellikler ⭐
+
+### 🆕 v2.2 Yeni Özellikler (Ocak 2025)
+
+#### 1. **Python 3.13+ Uyumluluğu** 🐍 **YENİ v2.2**
+- ✅ Python 3.13'te kaldırılan `imghdr` modülü artık gerekli değil
+- ✅ Sadece magic byte analizi ve PIL kullanılıyor
+- ✅ Python 3.7'den 3.13+'ya kadar tüm sürümlerle uyumlu
+- ✅ Daha hızlı ve daha güvenilir dosya tipi tespiti
+
+**Neden Bu Önemli?**
+Python 3.13 sürümünde `imghdr` modülü kaldırıldı. Eski sürüm Python 3.13'te şu hatayı veriyordu:
+```python
+ModuleNotFoundError: No module named 'imghdr'
+```
+Artık bu sorun tamamen çözüldü!
+
+#### 2. **Alt Klasör Desteği** 📁 **YENİ v2.2**
+- ✅ `kart_kayitlari/` klasörü içindeki **tüm alt klasörler** otomatik taranır
+- ✅ Sınırsız derinlikte klasör desteği
+- ✅ Dosya yolları düzgün şekilde korunur (örn: `pdf/dosya1.pdf`)
+- ✅ Organize klasörü de alt klasör yapısını korur
+
+**Örnek Klasör Yapısı (Artık Çalışıyor!):**
+```bash
+kart_kayitlari/
+├── dosya1.pdf                    ✅ Taranır
+├── pdf/
+│   ├── dosya2.pdf                ✅ Taranır (YENİ!)
+│   └── dosya3.pdf                ✅ Taranır (YENİ!)
+├── images/
+│   ├── kart1.jpg                 ✅ Taranır (YENİ!)
+│   └── belgeler/
+│       └── kart2.png             ✅ Taranır (YENİ! - 2. seviye)
+└── arsiv/
+    └── 2024/
+        └── ocak/
+            └── eski.pdf          ✅ Taranır (YENİ! - 3. seviye)
+```
+
+**Çıktıda Gösterim:**
+```
+Toplam 7 dosya taranacak / Total files to scan:
+  - PDF dosyaları / PDF files: 4
+  - Görsel dosyaları / Image files: 3
+
+[1/7] İşleniyor / Processing: dosya1.pdf
+[2/7] İşleniyor / Processing: pdf/dosya2.pdf
+[3/7] İşleniyor / Processing: pdf/dosya3.pdf
+[4/7] İşleniyor / Processing: images/kart1.jpg
+...
+```
+
+**Hata Mesajı da Güncellendi:**
+```
+Hata / Error: './kart_kayitlari' klasöründe veya alt klasörlerinde 
+desteklenen dosya bulunamadı.
+
+Not: Alt klasörler de taranır / Note: Subfolders are also scanned
+```
+
+---
+
+## OCR Kart Çıkartıcı v2.1 - Önceki Özellikler
 
 ### 🎯 Ana Özellikler
 
-#### 1. **Akıllı Dosya Tespit Sistemi** 🔍 **YENİ v2.1**
+#### 1. **Akıllı Dosya Tespit Sistemi** 🔍 **v2.1**
 Dosyalar artık sadece uzantıya göre değil, **içerik analizine** göre de tespit edilir:
 
 **Magic Byte (İçerik) Analizi:**
@@ -15,7 +78,7 @@ Dosyalar artık sadece uzantıya göre değil, **içerik analizine** göre de te
 - ✅ BMP: `BM` header tespiti
 - ✅ TIFF: `II 2A 00` (Little Endian) / `MM 00 2A` (Big Endian)
 - ✅ WebP: `RIFF...WEBP` tespiti
-- ✅ Fallback: Python `imghdr` + PIL doğrulaması
+- ✅ Fallback: PIL doğrulaması (v2.2'de `imghdr` kaldırıldı)
 
 **Neden Bu Önemli?**
 Bazı durumlarda dosyalar:
