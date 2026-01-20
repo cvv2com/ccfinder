@@ -9,7 +9,6 @@ from pdf2image import convert_from_path
 from PIL import Image
 import shutil
 from datetime import datetime
-import imghdr
 import mimetypes
 
 # --- AYARLAR / SETTINGS ---
@@ -171,11 +170,6 @@ def detect_file_type(filepath):
         if header.startswith(b'RIFF') and header[8:12] == b'WEBP':
             return 'image'
         
-        # imghdr modülünü de dene / Also try imghdr module
-        img_type = imghdr.what(filepath)
-        if img_type:
-            return 'image'
-        
         # PIL ile açmayı dene / Try opening with PIL
         try:
             with Image.open(filepath) as img:
@@ -331,8 +325,8 @@ def organize_file(filepath, card_info, organize_folder):
 
 def get_supported_files(folder):
     """
-    Klasördeki desteklenen tüm dosyaları listeler.
-    Lists all supported files in the folder.
+    Klasördeki ve alt klasörlerdeki desteklenen tüm dosyaları listeler.
+    Lists all supported files in the folder and its subdirectories.
     
     Hem uzantıya hem de dosya içeriğine bakarak tespit eder.
     Detects by both extension and file content.
@@ -342,24 +336,24 @@ def get_supported_files(folder):
     
     Returns:
         Dosya listesi ve tespit bilgileri / List of files with detection info
-        [(filename, file_type, detected_by), ...]
+        [(relative_filepath, file_type, detected_by), ...]
     """
     files = []
     if not os.path.exists(folder):
         return files
     
-    for filename in os.listdir(folder):
-        filepath = os.path.join(folder, filename)
-        
-        # Klasörleri atla / Skip directories
-        if os.path.isdir(filepath):
-            continue
-        
-        # Dosya tipini tespit et / Detect file type
-        is_valid, file_type, detected_by = is_potential_image_or_pdf(filepath)
-        
-        if is_valid:
-            files.append((filename, file_type, detected_by))
+    # Alt klasörleri de tara / Scan subdirectories as well
+    for root, dirs, filenames in os.walk(folder):
+        for filename in filenames:
+            filepath = os.path.join(root, filename)
+            
+            # Dosya tipini tespit et / Detect file type
+            is_valid, file_type, detected_by = is_potential_image_or_pdf(filepath)
+            
+            if is_valid:
+                # Relative path kullan / Use relative path for display
+                relative_path = os.path.relpath(filepath, folder)
+                files.append((relative_path, file_type, detected_by))
     
     return files
 
@@ -389,11 +383,12 @@ def main():
     files = get_supported_files(KAYNAK_KLASORU)
     
     if not files:
-        print(f"\nHata / Error: '{KAYNAK_KLASORU}' klasöründe desteklenen dosya bulunamadı.")
-        print(f"No supported files found in '{KAYNAK_KLASORU}' folder.")
+        print(f"\nHata / Error: '{KAYNAK_KLASORU}' klasöründe veya alt klasörlerinde desteklenen dosya bulunamadı.")
+        print(f"No supported files found in '{KAYNAK_KLASORU}' folder or its subfolders.")
         print(f"\nDesteklenen formatlar / Supported formats:")
         print(f"  - PDF: {PDF_EXTENSION}")
         print(f"  - Görseller / Images: {', '.join(IMAGE_EXTENSIONS)}")
+        print(f"\nNot: Alt klasörler de taranır / Note: Subfolders are also scanned")
         return
     
     # Dosya türlerini say / Count file types
@@ -428,11 +423,11 @@ def main():
     print("Tarama başlıyor / Scanning started...")
     print(f"{'='*70}\n")
 
-    for i, (filename, file_type, detected_by) in enumerate(files, 1):
-        filepath = os.path.join(KAYNAK_KLASORU, filename)
+    for i, (relative_path, file_type, detected_by) in enumerate(files, 1):
+        filepath = os.path.join(KAYNAK_KLASORU, relative_path)
         
         detection_info = f" [İçerik✓]" if detected_by == 'content' else ""
-        print(f"[{i}/{len(files)}] İşleniyor / Processing: {filename}{detection_info}")
+        print(f"[{i}/{len(files)}] İşleniyor / Processing: {relative_path}{detection_info}")
         
         try:
             # Dosya türüne göre işle / Process based on detected file type
@@ -447,7 +442,7 @@ def main():
 
             # Veriyi Regex ile çek / Extract data with regex
             card_info = extract_full_cc_details(full_text)
-            card_info['Dosya_Kaynagi'] = filename
+            card_info['Dosya_Kaynagi'] = relative_path
             card_info['Dosya_Tipi'] = file_type_label
             card_info['Tarama_Zamani'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             card_info['Tespit_Yontemi'] = 'İçerik Analizi' if detected_by == 'content' else 'Uzantı'
