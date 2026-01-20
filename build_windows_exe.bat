@@ -35,7 +35,14 @@ echo cvv2net.exe olusturuluyor / Building cvv2net.exe...
 echo ======================================================================
 pyinstaller --clean cvv2net.spec
 if errorlevel 1 (
+    echo.
     echo HATA: cvv2net.exe olusturulamadi / ERROR: Failed to build cvv2net.exe
+    echo.
+    echo Olasi Cozumler / Possible Solutions:
+    echo - cvv2net.py dosyasinin mevcut oldugundan emin olun / Ensure cvv2net.py exists
+    echo - PyInstaller dogru yuklendigini kontrol edin / Check PyInstaller is properly installed
+    echo - Hata mesajlarini yukarda inceleyin / Review error messages above
+    echo.
     pause
     exit /b 1
 )
@@ -46,7 +53,14 @@ echo ocr_card_extractor.exe olusturuluyor / Building ocr_card_extractor.exe...
 echo ======================================================================
 pyinstaller --clean ocr_card_extractor.spec
 if errorlevel 1 (
+    echo.
     echo HATA: ocr_card_extractor.exe olusturulamadi / ERROR: Failed to build ocr_card_extractor.exe
+    echo.
+    echo Olasi Cozumler / Possible Solutions:
+    echo - ocr_card_extractor.py dosyasinin mevcut oldugundan emin olun / Ensure ocr_card_extractor.py exists
+    echo - Tum gereksinimlerin yuklu oldugunu kontrol edin / Check all requirements are installed
+    echo - Hata mesajlarini yukarda inceleyin / Review error messages above
+    echo.
     pause
     exit /b 1
 )

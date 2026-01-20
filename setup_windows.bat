@@ -29,6 +29,9 @@ echo.
 REM Upgrade pip
 echo pip guncelleniyor / Upgrading pip...
 python -m pip install --upgrade pip
+if errorlevel 1 (
+    echo UYARI: pip guncellenemedi, devam ediliyor / WARNING: pip upgrade failed, continuing...
+)
 echo.
 
 REM Install requirements
