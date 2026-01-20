@@ -40,6 +40,8 @@ Thumbs.db
 *.csv
 musteri_kredi_kartlari_tam_liste.csv
 pdf_kayitlar/
+kart_kayitlari/
+organize_kartlar/
 
 # Test coverage
 .coverage

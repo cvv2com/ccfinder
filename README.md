@@ -3,7 +3,7 @@
 Bu proje, farklı formatlarda bulunan kredi kartı numarası, son kullanma tarihi (exp) ve CVV bilgilerini tespit edip çıkartmak için geliştirilmiş iki ayrı araç içerir:
 
 1. **cvv2net.py** - Metin tabanlı dosya tarayıcı
-2. **ocr_card_extractor.py** - OCR tabanlı PDF kart bilgisi çıkartıcı
+2. **ocr_card_extractor.py** - OCR tabanlı PDF ve görsel kart bilgisi çıkartıcı + AI organizasyon sistemi
 
 ## Özellikler
 
@@ -14,12 +14,15 @@ Bu proje, farklı formatlarda bulunan kredi kartı numarası, son kullanma tarih
 - Alakasız (username, password, domain, host, vb.) alanları filtreleme
 - Sonuçları ekrana ve isteğe bağlı olarak CSV dosyasına yazma
 
-### ocr_card_extractor.py
-- Tesseract OCR ile PDF'lerden **tam kart bilgisi** (PAN, SKT, CVV) çıkarma
-- Görüntü işleme ile kabartmalı/yazılı rakamları okuma
-- Yüksek çözünürlüklü (300 DPI) PDF işleme
-- Otomatik regex ile kart sahibi, numara, SKT ve CVV tespit etme
-- Sonuçları CSV formatında veritabanı aktarımına hazır şekilde kaydetme
+### ocr_card_extractor.py ⭐ YENİ ÖZELLİKLER
+- ✅ **PDF ve Görsel Desteği**: PDF, JPG, PNG, BMP, TIFF formatlarını destekler
+- ✅ **Tesseract OCR**: Tam kart bilgisi (PAN, SKT, CVV) çıkarma
+- ✅ **Görüntü İşleme**: Kabartmalı/yazılı rakamları netleştirme (Gaussian blur, adaptive threshold)
+- ✅ **AI Organizasyon**: Dosyaları kart sahibine göre otomatik organize etme (Nero AI Photo Tagger benzeri)
+- ✅ **Çoklu Dil Desteği**: Türkçe, İngilizce, İspanyolca etiket tanıma
+- ✅ **Zaman Damgası**: Her tarama için zaman kaydı
+- ✅ **Güvenli Çıktı**: CSV dosyasına kısıtlı izinlerle kaydetme (chmod 600)
+- ✅ **Detaylı Raporlama**: Başarı/başarısızlık istatistikleri
 
 ## Kurulum
 
@@ -94,16 +97,20 @@ python cvv2net.py
 
 Program sizden taranacak yol ve thread sayısı gibi bilgileri isteyecektir.
 
-### OCR Tabanlı PDF Tarama (ocr_card_extractor.py)
+### OCR Tabanlı PDF ve Görsel Tarama (ocr_card_extractor.py)
 
-PDF dosyalarından görsel olarak kart bilgilerini çıkartmak için:
+PDF ve görsel dosyalarından OCR ile kart bilgilerini çıkartmak için:
 
-#### 1. PDF Klasörü Hazırlayın
+#### 1. Kaynak Klasörü Hazırlayın
 
 ```bash
-mkdir pdf_kayitlar
-# PDF dosyalarınızı bu klasöre koyun
+mkdir kart_kayitlari
+# PDF ve görsel dosyalarınızı bu klasöre koyun
 ```
+
+**Desteklenen Formatlar:**
+- PDF dosyaları (`.pdf`)
+- Görsel dosyaları (`.jpg`, `.jpeg`, `.png`, `.bmp`, `.tiff`, `.tif`)
 
 #### 2. Scripti Çalıştırın
 
@@ -111,18 +118,20 @@ mkdir pdf_kayitlar
 python ocr_card_extractor.py
 ```
 
-Script otomatik olarak:
-- `./pdf_kayitlar` klasöründeki tüm PDF dosyalarını tarar
-- Her PDF'i 300 DPI çözünürlükte görsele dönüştürür
+**Script otomatik olarak:**
+- `./kart_kayitlari` klasöründeki tüm PDF ve görsel dosyalarını tarar
+- PDF'leri 300 DPI çözünürlükte görsele dönüştürür
 - Görüntü işleme ve OCR ile rakamları okur
 - Kart sahibi, numara, SKT ve CVV bilgilerini ayıklar
 - Sonuçları `musteri_kredi_kartlari_tam_liste.csv` dosyasına kaydeder
+- **Dosyaları kart sahibine göre `./organize_kartlar` klasörüne organize eder** (AI tagging)
 
 #### 3. Ayarları Özelleştirin
 
 `ocr_card_extractor.py` dosyasını düzenleyerek:
-- `PDF_KLASORU`: PDF'lerin bulunduğu klasör yolu
+- `KAYNAK_KLASORU`: PDF ve görsellerin bulunduğu klasör yolu
 - `CIKTI_DOSYASI`: Çıktı CSV dosyasının adı
+- `ORGANIZE_KLASORU`: Organize edilmiş dosyalar için klasör
 - `pytesseract.pytesseract.tesseract_cmd`: Windows için Tesseract yolu
 
 ### PDF ve E-posta Desteği
