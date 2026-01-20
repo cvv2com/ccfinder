@@ -14,10 +14,12 @@ Bu proje, farklı formatlarda bulunan kredi kartı numarası, son kullanma tarih
 - Alakasız (username, password, domain, host, vb.) alanları filtreleme
 - Sonuçları ekrana ve isteğe bağlı olarak CSV dosyasına yazma
 
-### ocr_card_extractor.py ⭐ YENİ ÖZELLİKLER v2.1
+### ocr_card_extractor.py ⭐ YENİ ÖZELLİKLER v2.2
 - ✅ **PDF ve Görsel Desteği**: PDF, JPG, PNG, BMP, TIFF formatlarını destekler
-- ✅ **Akıllı Dosya Tespiti** 🆕: İçerik analiziyle yanlış/eksik uzantılı dosyaları tespit eder
-- ✅ **Magic Byte Analizi** 🆕: Uzantıdan bağımsız format tespiti (PDF, JPEG, PNG, GIF, BMP, TIFF, WebP)
+- ✅ **Alt Klasör Desteği** 🆕: Klasör içindeki tüm alt klasörleri otomatik tarar
+- ✅ **Python 3.13+ Uyumlu** 🆕: Kaldırılan `imghdr` modülü gerektirmez
+- ✅ **Akıllı Dosya Tespiti**: İçerik analiziyle yanlış/eksik uzantılı dosyaları tespit eder
+- ✅ **Magic Byte Analizi**: Uzantıdan bağımsız format tespiti (PDF, JPEG, PNG, GIF, BMP, TIFF, WebP)
 - ✅ **Tesseract OCR**: Tam kart bilgisi (PAN, SKT, CVV) çıkarma
 - ✅ **Görüntü İşleme**: Kabartmalı/yazılı rakamları netleştirme (Gaussian blur, adaptive threshold)
 - ✅ **AI Organizasyon**: Dosyaları kart sahibine göre otomatik organize etme (Nero AI Photo Tagger benzeri)
@@ -45,6 +47,8 @@ Bu proje, farklı formatlarda bulunan kredi kartı numarası, son kullanma tarih
 ### 1. Python Kurulumu
 
 Öncelikle [Python 3](https://www.python.org/downloads/) yüklü olmalı.
+
+> **Not:** Python 3.13+ uyumlu - `imghdr` modülü gerektirmez.
 
 ### 2. Sistem Gereksinimleri (OCR için)
 
@@ -168,12 +172,23 @@ PDF ve görsel dosyalarından OCR ile kart bilgilerini çıkartmak için:
 
 ```bash
 mkdir kart_kayitlari
-# PDF ve görsel dosyalarınızı bu klasöre koyun
+# PDF ve görsel dosyalarınızı bu klasöre veya alt klasörlerine koyun
 ```
 
 **Desteklenen Formatlar:**
 - PDF dosyaları (`.pdf`)
 - Görsel dosyaları (`.jpg`, `.jpeg`, `.png`, `.bmp`, `.tiff`, `.tif`)
+
+**Örnek Klasör Yapısı (Alt klasörler desteklenir):**
+```
+kart_kayitlari/
+├── dosya1.pdf
+├── pdf/
+│   ├── dosya2.pdf
+│   └── dosya3.pdf
+└── images/
+    └── kart1.jpg
+```
 
 #### 2. Scripti Çalıştırın
 
@@ -182,7 +197,7 @@ python ocr_card_extractor.py
 ```
 
 **Script otomatik olarak:**
-- `./kart_kayitlari` klasöründeki tüm PDF ve görsel dosyalarını tarar
+- `./kart_kayitlari` klasöründeki ve **tüm alt klasörlerindeki** PDF ve görsel dosyalarını tarar
 - PDF'leri 300 DPI çözünürlükte görsele dönüştürür
 - Görüntü işleme ve OCR ile rakamları okur
 - Kart sahibi, numara, SKT ve CVV bilgilerini ayıklar
